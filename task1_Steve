@@ -1,0 +1,45 @@
+let request = require('request');
+let Q = require('q');
+let _ = require('underscore');
+
+let week48 = "https://gist.githubusercontent.com/steaks/134c4d1eb22f16a51da5b7f4db978f86/raw/1c15a5848dd0777441be0918da8f690c637d0339/hnc_kroger_2017-12-03_2017-12-09.json";
+let week49 = "https://gist.githubusercontent.com/steaks/39918bb0f09ef23d35d6cb555984273b/raw/5b65e1d15edbf835ab21c214b62769874d7179fb/hnc_kroger_2017-12-10_2017-12-16.json";
+let week50 = "https://gist.githubusercontent.com/steaks/0af46be0dfc6d7ecd31c7519f49c7267/raw/8073921905d65f61019a1e87444fee979f272b88/hnc_kroger_2017-12-17_2017-12-23.json";
+let week51 = "https://gist.githubusercontent.com/steaks/425ffc7124f0544846e6283ea464164d/raw/6379f8304fb933b082ee276dbf3f6a3b49b9a2a4/hnc_kroger_2017-12-24_2017-12-30.json";
+let week52 = "https://gist.githubusercontent.com/steaks/d5ed955528cd9f8d0d3b6b0a0586a201/raw/c9cca1953b6a43773e6dfc4bf96a3ff9b8aec326/hnc_kroger_2017-12-31_2018-01-06.json";
+
+let get = url => {
+  let deferred = Q.defer();
+  request(url, (error, response, body) => {
+    deferred.resolve(JSON.parse(body));
+  });
+  return deferred.promise;
+};
+
+//get();
+
+//console.log(get(week49));
+
+/*
+get(week48).then(data => {
+  get(week49)
+    .then(data => {
+    console.log(data);
+  })
+  console.log(data);
+})
+  .catch(err => console.log(err));
+*/
+
+Q
+  .all([get(week48), get(week49), get(week50), get(week51), get(week52)])
+  .spread((week48Response, week49Response, week50Response, week51Response, week52Response) => {
+    week48Response.result.data[0].res.map(value => {
+      if (value.proPr) {
+        console.log(value.proPr.pr);
+      } else {
+        console.log(value.pr.pr);
+      }
+    });
+  })
+  .catch(err => console.log(err));
